@@ -1,22 +1,37 @@
-### AL ###
-#Template for AL projects for Dynamics 365 Business Central
-#launch.json folder
-.vscode/
-#Cache folder
-.alcache/
-#Symbols folder
-.alpackages/
-#Snapshots folder
-.snapshots/
-#Testing Output folder
-.output/
-#Extension App-file
-*.app
-#Rapid Application Development File
-rad.json
-#Translation Base-file
-*.g.xlf
-#License-file
-*.flf
-#Test results file
-TestResults.xml
+import openai
+from telegram import Update
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
+
+# Встановіть ваші токени
+TELEGRAM_TOKEN = '7591961260:AAGvDanAMX86wRngwyw6_1VFSFxP0VLhLcY'
+OPENAI_API_KEY = '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'
+
+openai.api_key = OPENAI_API_KEY
+
+def start(update: Update, context: CallbackContext) -> None:
+    update.message.reply_text('Привіт! Я бот, який відповідає на ваші питання. Чим можу допомогти?')
+
+def respond(update: Update, context: CallbackContext) -> None:
+    user_message = update.message.text
+
+    # Відправка запиту до OpenAI API
+    response = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        messages=[{"role": "user", "content": user_message}]
+    )
+
+    bot_reply = response['choices'][0]['message']['content']
+    update.message.reply_text(bot_reply)
+
+def main() -> None:
+    updater = Updater(TELEGRAM_TOKEN)
+    dispatcher = updater.dispatcher
+
+    dispatcher.add_handler(CommandHandler("start", start))
+    dispatcher.add_handler(MessageHandler(Filters.text & ~Filters.command, respond))
+
+    updater.start_polling()
+    updater.idle()
+
+if name == 'main':
+    main()
